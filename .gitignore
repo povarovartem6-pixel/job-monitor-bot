@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Секреты
+.env
+
+# Данные
+jobs.db
+*.db
+*.sqlite3
+
+# Логи
+*.log
+
+# IDE
+.idea/
+.vscode/
+.DS_Store
