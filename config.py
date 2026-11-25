@@ -1,25 +1,42 @@
+"""
+Конфигурация бота. Все значения читаются из .env (или переменных окружения).
+Скопируйте .env.example в .env и заполните своими данными.
+"""
 import os
 from pathlib import Path
+
 from dotenv import load_dotenv
 
-load_dotenv()
+# Загружаем .env из корня проекта
+BASE_DIR = Path(__file__).resolve().parent
+load_dotenv(BASE_DIR / ".env")
 
-BOT_TOKEN = os.getenv("BOT_TOKEN", "")
-TARGET_CHAT_ID = int(os.getenv("TARGET_CHAT_ID", "0"))
-ADMIN_ID = int(os.getenv("ADMIN_ID", "0"))
-CHECK_INTERVAL_SECONDS = int(os.getenv("CHECK_INTERVAL_SECONDS", "180"))
-SILENT_FIRST_RUN = os.getenv("SILENT_FIRST_RUN", "true").lower() == "true"
-MIN_BUDGET = int(os.getenv("MIN_BUDGET", "15000"))
 
-DB_PATH = os.getenv("DB_PATH", "jobs.db")
+def _require(name: str) -> str:
+    value = os.getenv(name, "").strip()
+    if not value:
+        raise ValueError(f"Переменная окружения {name} не задана. Проверьте .env")
+    return value
 
-KEYWORDS = [...]
-STOP_WORDS = [...]
 
-# Validate
-if not BOT_TOKEN:
-    raise ValueError("BOT_TOKEN не задан...")
-if TARGET_CHAT_ID == 0:
-    raise ValueError("TARGET_CHAT_ID не задан...")
-if ADMIN_ID == 0:
-    raise ValueError("ADMIN_ID не задан...")
+# --- Секреты (обязательные) ---
+BOT_TOKEN: str = _require("BOT_TOKEN")
+TARGET_CHAT_ID: int = int(_require("TARGET_CHAT_ID"))
+ADMIN_ID: int = int(_require("ADMIN_ID"))
+
+# --- Параметры работы (со значениями по умолчанию) ---
+CHECK_INTERVAL_SECONDS: int = int(os.getenv("CHECK_INTERVAL_SECONDS", "180"))
+SILENT_FIRST_RUN: bool = os.getenv("SILENT_FIRST_RUN", "true").lower() in ("1", "true", "yes")
+MIN_BUDGET: int = int(os.getenv("MIN_BUDGET", "15000"))
+DB_PATH: str = os.getenv("DB_PATH", str(BASE_DIR / "jobs.db"))
+
+# --- Ключевые слова (стартовый набор; далее управляются через /add_kw, /del_kw) ---
+DEFAULT_KEYWORDS: list[str] = [
+    "бот", "воронка", "упаковка", "лендинг", "автоматизация",
+    "ии", "нейросет", "telegram", "чат-бот", "парсер", "инфографика",
+]
+
+# --- Стоп-слова: если встречаются в тексте заказа, он отбрасывается ---
+STOP_WORDS: list[str] = [
+    "бесплатно", "за отзыв", "тестовое без оплаты", "стажер", "стажёр",
+]
