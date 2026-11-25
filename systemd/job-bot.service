@@ -1,0 +1,16 @@
+[Unit]
+Description=Telegram Job Monitoring Bot
+After=network.target
+
+[Service]
+Type=simple
+User=your_user
+WorkingDirectory=/opt/job-monitor-bot
+ExecStart=/opt/job-monitor-bot/venv/bin/python /opt/job-monitor-bot/bot.py
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
